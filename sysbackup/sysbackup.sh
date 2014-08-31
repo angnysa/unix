@@ -124,8 +124,8 @@ do
 
     if $BACKUP_PKG_LIST
     then
-      rm -rf "$(basename "$manager" .sh).archives"
-      mkdir "$(basename "$manager" .sh).archives"
+      rm -rf "$BACKUP_DEST/$(basename "$manager" .sh).archives"
+      mkdir "$BACKUP_DEST/$(basename "$manager" .sh).archives"
       list_packages_files | while read file
       do
 	cp "$file" "$BACKUP_DEST/$(basename "$manager" .sh).archives"
