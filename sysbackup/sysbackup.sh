@@ -9,6 +9,7 @@ BACKUP_CONFIG=false
 BACKUP_PKG_LIST=false
 BACKUP_PKG_ARCH=false
 BACKUP_DEST=
+RSYNC_OPTS="-rlt --delete"
 
 
 
@@ -120,7 +121,7 @@ do
 
   if manager_useable
   then
-    make_file_stream | sort -u | rsync -a --delete --files-from=- / $BACKUP_DEST
+    make_file_stream | sort -u | rsync $RSYNC_OPTS --files-from=- / $BACKUP_DEST
 
     if $BACKUP_PKG_LIST
     then
