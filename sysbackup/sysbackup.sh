@@ -9,7 +9,7 @@ BACKUP_CONFIG=false
 BACKUP_PKG_LIST=false
 BACKUP_PKG_ARCH=false
 BACKUP_DEST=
-RSYNC_OPTS="-rlt --delete"
+RSYNC_OPTS="-a --delete"
 
 
 

@@ -26,6 +26,13 @@ function restore_packages {
 }
 
 function restore_package_archives {
-  echo ERROR : list_packages_files not implemented.
-  exit 1
+  if [ -z "$1" ]
+  then
+    cat | xargs pacman -S 
+  else
+    cat | while read pkg
+    do
+      pacman 
+    done
+  fi
 }
