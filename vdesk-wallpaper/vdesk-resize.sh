@@ -27,29 +27,29 @@ do
   case "$1" in
     -r|--resolution)
       shift
-      resolution=$1
+      resolution="$1"
       shift
       ;;
     -l|--layout)
       shift
-      layout=$1
+      layout="$1"
       shift
       ;;
     -z|--zoom)
       shift
-      zoom=$1
+      zoom="$1"
       shift
       ;;
     -a|--align)
       shift
-      =$1
+      align="$1"
       shift
       ;;
     '')
       break
       ;;
     *)
-      img=$1
+      img="$1"
       shift
       ;;
   esac
@@ -101,7 +101,10 @@ USAGE
 fi
 
 function debug {
-  echo [DEBUG] $@
+  if [ -n "$DEBUG" ]
+  then
+    echo [DEBUG] $@
+  fi
 }
 
 
@@ -160,7 +163,7 @@ debug zoomed desktop = $zdesk_c x $zdesk_l
 if [ "$align_h" = "%" ]
 then
   align_h=$(bc -l <<< "$img_w / 2 - $zdesk_c / 2 + .5" | cut -d'.' -f1)
-elif [ "$align_h" -lt 0 ]
+elif [ ${align_h:0:1} = - ]
 then
   align_h=$(bc -l <<< "$img_w - $align_h - $zdesk_c")
 fi
@@ -169,7 +172,7 @@ fi
 if [ "$align_v" = "%" ]
 then
   align_v=$(bc -l <<< "$img_h / 2 - $zdesk_l / 2 + .5" | cut -d'.' -f1)
-elif [ "$align_v" -lt 0 ]
+elif [ ${align_v:0:1} = - ]
 then
   align_v=$(bc -l <<< "$img_h - $align_v - $zdesk_l")
 fi
@@ -182,12 +185,24 @@ debug offset = +$align_h +$align_v
 
 if [ $(( $align_h + $zdesk_c )) -gt $img_w -o $(( $align_v + $zdesk_l )) -gt $img_h ]
 then
-  echo ERROR : image is not large enough : Size is ${img_w}x${img_h}, ${zdesk_c}x${zdesk_l} or greater required
-  exit 1
+  echo WARN : image is not large enough : Size is ${img_w}x${img_h}, ${zdesk_c}x${zdesk_l} or greater recommended
+  echo WARN : Result could be blurry !
 fi
 
 
 
-#convert "$img" +repage -crop ${zdesk_c}x${zdesk_l}+$align_h+$align_v "$img_base"_cropped.$img_ext # -crop ${zres_c}x${zres_l} +repage "$img_base"_%d.$img_ext
+convert "$img" +repage -crop ${zdesk_c}x${zdesk_l}+$align_h+$align_v "$img_base"_cropped.$img_ext
 
+ret=$?
+if [ $ret -ne 0 ]
+then
+  echo ERROR : convert returned $ret
+else
+  convert "$img_base"_cropped.$img_ext +repage -crop ${zres_c}x${zres_l} +repage "$img_base"_%d.$img_ext
 
+  ret=$?
+  if [ $ret -ne 0 ]
+  then
+    echo ERROR : convert returned $ret
+  fi
+fi
